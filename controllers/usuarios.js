@@ -6,14 +6,24 @@ const { generarJWT } = require('../helpers/jwt');
 
 const getUsuarios = async (req, res = response) => {
 
-    const usuarios = await Usuario.find();
+    const desde = Number(req.query.desde) || 0;
+    console.log(desde);
+
+    const [usuarios, total] = await Promise.all([
+        Usuario.find()
+            .skip(desde)
+            .limit(15),
+
+        Usuario.countDocuments()
+    ]);
 
     try {
         const uid = req.uid;
         res.json({
             obj: true,
             usuarios,
-            uid
+            uid,
+            total
         })
     }
     catch (error) {
@@ -116,7 +126,7 @@ const actualizarUsuario = async (req, res = response) => {
 const borrarUsuario = async (req, res = response) => {
     const uid = req.params.id;
 
-    try{
+    try {
         const usuarioDB = await Usuario.findById(uid);
         if (!usuarioDB) {
             return res.status(404).json({
@@ -132,14 +142,14 @@ const borrarUsuario = async (req, res = response) => {
             msg: "Usuario eliminado"
         });
     }
-    catch(error){
+    catch (error) {
         return res.status(500).json({
             obj: true,
             msg: "Error inesperado"
         })
     }
 
-    
+
 }
 
 module.exports = { getUsuarios, crearUsuario, actualizarUsuario, borrarUsuario };
