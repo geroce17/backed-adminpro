@@ -38,18 +38,68 @@ const crearMedico = async (req, res = response) => {
     }
 }
 
-const actualizarMedico = (req, res = response) => {
-    res.json({
-        ok: true,
-        msg: "actualizarMedico"
-    })
+const actualizarMedico = async (req, res = response) => {
+    try{
+        const idmedico = req.params.id;
+        const idusuario = req.uid;
+
+        const registroMedico = await Medico.findById(idmedico);
+
+        if(!registroMedico){
+            res.status(404).json({
+                ok: true,
+                msg: 'Medico no encontrado'
+            });
+        }
+
+        const cambiosMedico = {
+            ...req.body,
+            usuario: idusuario,
+        };
+
+        const medicoActualizado = await Medico.findByIdAndUpdate(idmedico, cambiosMedico, {new: true});
+
+        res.json({
+            ok: true,
+            medicoActualizado
+        });
+    }
+    catch(e){
+        console.log(e);
+        res.json({
+            ok: false,
+            msg: "Error"
+        });
+    }
 }
 
-const borrarMedico = (req, res = response) => {
-    res.json({
-        ok: true,
-        msg: "borrarMedico"
-    })
+const borrarMedico = async (req, res = response) => {
+    try{
+        const idmedico = req.params.id;
+
+        const medicoRegistro = await Medico.findById(idmedico);
+
+        if(!medicoRegistro){
+            res.status(404).json({
+                ok: true,
+                msg: 'Medico no encontrado'
+            });
+        }
+
+        await Medico.findByIdAndDelete(idmedico);
+
+        res.json({
+            ok: true,
+            msg: 'Medico eliminado'
+        });
+    }
+    catch(e){
+        console.log(e);
+        res.json({
+            ok: false,
+            msg: "Error"
+        });
+    }
 }
 
 module.exports = {

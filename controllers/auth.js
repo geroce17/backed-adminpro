@@ -2,7 +2,7 @@ const { response } = require('express');
 const bcrypt = require('bcryptjs');
 
 const Usuario = require('../models/usuario');
-const {generarJWT} = require('../helpers/jwt');
+const { generarJWT } = require('../helpers/jwt');
 const { googleVerify } = require('../helpers/google-verify');
 
 const login = async (req, res = response) => {
@@ -21,7 +21,7 @@ const login = async (req, res = response) => {
 
         // Verificar contraseña
         const validPassword = bcrypt.compareSync(password, usuarioDB.password);
-        if(!validPassword){
+        if (!validPassword) {
             return res.status(400).json({
                 ok: false,
                 msg: "Contraseña no valida"
@@ -47,12 +47,12 @@ const login = async (req, res = response) => {
 
 const googleSignIn = async (req, res = response) => {
     const googleToken = req.body.token;
-    
-    try{
-        const {name, email, picture} = await googleVerify(googleToken);
+
+    try {
+        const { name, email, picture } = await googleVerify(googleToken);
         let usuario;
-        const usuarioDB = await Usuario.findOne({email});
-        if(!usuarioDB){
+        const usuarioDB = await Usuario.findOne({ email });
+        if (!usuarioDB) {
             usuario = new Usuario({
                 nombre: name,
                 email,
@@ -61,7 +61,7 @@ const googleSignIn = async (req, res = response) => {
                 google: true
             });
         }
-        else{
+        else {
             usuario = usuarioDB;
             usuario.google = true;
         }
@@ -74,13 +74,23 @@ const googleSignIn = async (req, res = response) => {
             token
         })
     }
-    catch(e){
+    catch (e) {
         console.log(e);
         res.json({
             ok: false,
-            
+
         })
     }
 }
 
-module.exports = { login, googleSignIn };
+const renewToken = async (req, res = response) => {
+    const uid = req.uid;
+    const token = await generarJWT(uid);
+
+    res.json({
+        ok: true,
+        token
+    })
+}
+
+module.exports = { login, googleSignIn, renewToken };
