@@ -12,7 +12,7 @@ const getUsuarios = async (req, res = response) => {
     const [usuarios, total] = await Promise.all([
         Usuario.find()
             .skip(desde)
-            .limit(15),
+            .limit(10),
 
         Usuario.countDocuments()
     ]);
@@ -45,7 +45,7 @@ const crearUsuario = async (req, res) => {
         if (existeEmail) {
             return res.status(400).json({
                 ok: false,
-                msg: "El correo ya esta registrado"
+                msg: 'El correo ya está registrado'
             })
         }
 
@@ -61,7 +61,7 @@ const crearUsuario = async (req, res) => {
         const token = await generarJWT(usuario.id);
 
         res.json({
-            obj: true,
+            ok: true,
             usuario,
             token
         })
@@ -80,7 +80,8 @@ const crearUsuario = async (req, res) => {
 // TODO: Validar token y comprobar si es el usuario correcto
 const actualizarUsuario = async (req, res = response) => {
     const uid = req.params.id;
-
+    console.log(req.body);
+    console.log(uid);
     try {
 
         const usuarioDB = await Usuario.findById(uid);
@@ -104,9 +105,17 @@ const actualizarUsuario = async (req, res = response) => {
             }
         }
 
-        campos.email = email;
+        if (!usuarioDB.google) {
+            campos.email = email;
+        }
+        else if (usuarioDB.email !== email) {
+            return res.status(400).json({
+                ok: false,
+                msg: 'No puedes cambiar tu correo electronico siendo usuario de google'
+            });
+        }
+        
         const usuarioActualizado = await Usuario.findByIdAndUpdate(uid, campos, { new: true });
-
 
         res.json({
             ok: true,

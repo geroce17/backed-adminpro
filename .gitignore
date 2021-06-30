@@ -1,1 +1,18 @@
+# Ignore node modules directory 
 node_modules/
+
+# Ignore files related to API keys
+.env
+
+#uploads
+uploads/hospitales/**.jpg
+uploads/hospitales/**.png
+uploads/hospitales/**.gif
+
+uploads/medicos/**.jpg
+uploads/medicos/**.png
+uploads/medicos/**.gif
+
+uploads/usuarios/**.jpg
+uploads/usuarios/**.png
+uploads/usuarios/**.gif
