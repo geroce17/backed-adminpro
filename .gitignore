@@ -4,7 +4,7 @@ node_modules/
 # Ignore files related to API keys
 .env
 
-#uploads
+# Uploads
 uploads/hospitales/**.jpg
 uploads/hospitales/**.png
 uploads/hospitales/**.gif
